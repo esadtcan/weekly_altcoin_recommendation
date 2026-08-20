@@ -1,0 +1,16 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "coin-advisor"
+version = "0.1.0"
+description = "Daily, explainable crypto candidate ranking and email report"
+requires-python = ">=3.9"
+
+[project.scripts]
+coin-advisor = "coin_advisor.__main__:main"
+
+[tool.setuptools]
+packages = ["coin_advisor"]
+
