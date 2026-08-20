@@ -10,7 +10,7 @@ from .scoring import rank_coins
 
 
 def build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(description="Günlük coin aday raporu üretir")
+    parser = argparse.ArgumentParser(description="daily_altcoin_recommendation raporu üretir")
     parser.add_argument("--dry-run", action="store_true", help="E-posta gönderme, raporu dosyaya yaz")
     parser.add_argument("--output", default="reports/latest.html", help="HTML çıktı yolu")
     return parser
@@ -39,7 +39,7 @@ def main() -> None:
         for index, item in enumerate(ranked[:settings.top_n], 1):
             print(f"{index}. {item.metrics.name} ({item.metrics.symbol}): {item.score:.1f}")
     else:
-        subject = f"Günün En Güçlü {settings.top_n} Coin Adayı — {now:%d.%m.%Y}"
+        subject = f"daily_altcoin_recommendation — {now:%d.%m.%Y}"
         send_email(settings, subject, plain, html)
         print(f"Rapor {settings.smtp_to} adresine gönderildi")
 

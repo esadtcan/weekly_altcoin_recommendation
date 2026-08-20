@@ -1,8 +1,8 @@
 import unittest
 
-from coin_advisor.models import CoinMetrics
-from coin_advisor.providers import _relative_return
-from coin_advisor.scoring import _percentiles, rank_coins
+from daily_altcoin_recommendation.models import CoinMetrics
+from daily_altcoin_recommendation.providers import _relative_return
+from daily_altcoin_recommendation.scoring import _percentiles, rank_coins
 
 
 def coin(coin_id, name, symbol, usd7, btc7, volume, tvl=None, usd24=1, usd30=10):

@@ -1,4 +1,4 @@
-# Coin Advisor
+# daily_altcoin_recommendation
 
 Her gün piyasa ve DeFi verilerini toplayıp açıklanabilir biçimde en güçlü 5 coin adayını sıralayan, HTML e-posta raporu üreten karar destek sistemi.
 
@@ -28,7 +28,7 @@ Python 3.9 veya üzeri yeterlidir; harici Python paketi gerekmez.
 
 ```bash
 python3 -m unittest discover -s tests -v
-python3 -m coin_advisor --dry-run
+python3 -m daily_altcoin_recommendation --dry-run
 ```
 
 Oluşan rapor `reports/latest.html` dosyasına yazılır.
@@ -54,7 +54,7 @@ SMTP_STARTTLS=true
 Gönderim:
 
 ```bash
-python3 -m coin_advisor
+python3 -m daily_altcoin_recommendation
 ```
 
 ## Günlük zamanlama
@@ -62,25 +62,25 @@ python3 -m coin_advisor
 macOS/Linux `cron` örneği, her gün İstanbul saatiyle 09:00 için (makinenin saat dilimi Europe/Istanbul ise):
 
 ```cron
-0 9 * * * cd "/absolute/path/to/Coin Tavsiye Botu" && /usr/bin/python3 -m coin_advisor >> /tmp/coin-advisor.log 2>&1
+0 9 * * * cd "/absolute/path/to/daily_altcoin_recommendation" && /usr/bin/python3 -m daily_altcoin_recommendation >> /tmp/daily_altcoin_recommendation.log 2>&1
 ```
 
 Bilgisayar kapalı veya uykudaysa yerel zamanlayıcı çalışmayabilir. Sürekli çalışma için GitHub Actions, bir VPS veya sunucusuz zamanlayıcı kullanılmalıdır. E-posta ve API anahtarları repoya kaydedilmemelidir.
 
-Repoda hazır gelen `.github/workflows/daily-report.yml`, her gün 06:00 UTC/09:00 İstanbul saatinde çalışır. GitHub deposunun `Settings → Secrets and variables → Actions` bölümüne `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASSWORD`, `SMTP_FROM`, `SMTP_TO` ve isteğe bağlı `COINGECKO_API_KEY` secret'larını ekleyin. İlk gönderimi `Actions → Daily coin report → Run workflow` ile elle deneyin.
+Repoda hazır gelen `.github/workflows/daily_altcoin_recommendation.yml`, her gün 09:05 İstanbul saatinde çalışır. GitHub deposunun `Settings → Secrets and variables → Actions` bölümüne `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASSWORD`, `SMTP_FROM`, `SMTP_TO` ve isteğe bağlı `COINGECKO_API_KEY` secret'larını ekleyin. İlk gönderimi `Actions → daily_altcoin_recommendation → Run workflow` ile elle deneyin.
 
 ## Tarihsel simülasyon
 
 30 coinlik araştırma evrenini geçmiş bir günün kapanışında sıralayıp sonraki yedi günlük getiriyi ölçmek için:
 
 ```bash
-python3 -m coin_advisor.backtest --as-of 2026-08-13 --top 5
+python3 -m daily_altcoin_recommendation.backtest --as-of 2026-08-13 --top 5
 ```
 
 Bir tarih aralığındaki her günün ayrı önerilerini görmek için:
 
 ```bash
-python3 -m coin_advisor.backtest --as-of 2026-08-14 --daily-through 2026-08-20 --top 5
+python3 -m daily_altcoin_recommendation.backtest --as-of 2026-08-14 --daily-through 2026-08-20 --top 5
 ```
 
 Simülasyon CoinGecko'nun tarihsel fiyat, market-cap ve hacmini; DefiLlama'nın tarihsel TVL'sini kullanır. Geçmiş DEX hacmi, haberler, sosyal veriler ve ücretsiz planda bulunmayan kesin tarihsel arz/unlock bilgileri dahil değildir. Geçmiş MC/FDV yaklaşık olarak güncel orandan türetilir; sonuç bu nedenle araştırma simülasyonudur, eksiksiz bir kurumsal backtest değildir.

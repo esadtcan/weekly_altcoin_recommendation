@@ -3,14 +3,13 @@ requires = ["setuptools>=61"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "coin-advisor"
+name = "daily_altcoin_recommendation"
 version = "0.1.0"
 description = "Daily, explainable crypto candidate ranking and email report"
 requires-python = ">=3.9"
 
 [project.scripts]
-coin-advisor = "coin_advisor.__main__:main"
+daily_altcoin_recommendation = "daily_altcoin_recommendation.__main__:main"
 
 [tool.setuptools]
-packages = ["coin_advisor"]
-
+packages = ["daily_altcoin_recommendation"]

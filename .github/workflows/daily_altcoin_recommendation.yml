@@ -1,4 +1,4 @@
-name: Daily coin report
+name: daily_altcoin_recommendation
 
 on:
   workflow_dispatch:
@@ -31,4 +31,4 @@ jobs:
       - name: Run tests
         run: python -m unittest discover -s tests -v
       - name: Send report
-        run: python -m coin_advisor
+        run: python -m daily_altcoin_recommendation

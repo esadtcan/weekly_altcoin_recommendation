@@ -19,7 +19,7 @@ def get_json(
 ) -> Any:
     if params:
         url = f"{url}?{urlencode(params)}"
-    request_headers = {"Accept": "application/json", "User-Agent": "coin-advisor/0.1"}
+    request_headers = {"Accept": "application/json", "User-Agent": "daily_altcoin_recommendation/0.1"}
     request_headers.update(headers or {})
     last_error: Optional[Exception] = None
     for attempt in range(retries + 1):
@@ -32,4 +32,3 @@ def get_json(
             if attempt < retries:
                 time.sleep(1.5 * (attempt + 1))
     raise ApiError(f"API request failed for {url}: {last_error}")
-
