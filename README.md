@@ -1,6 +1,6 @@
 # daily_altcoin_recommendation
 
-Her gün piyasa ve DeFi verilerini toplayıp açıklanabilir biçimde en güçlü 5 coin adayını sıralayan, HTML e-posta raporu üreten karar destek sistemi.
+Her pazartesi piyasa ve DeFi verilerini toplayıp en güçlü 5 altcoinden 100 USD'lik açıklanabilir bir sepet oluşturan HTML e-posta karar destek sistemi.
 
 BTC sıralamaya girmez; altcoinler için piyasa ve relatif performans benchmark'ı olarak kullanılır.
 
@@ -8,7 +8,7 @@ BTC sıralamaya girmez; altcoinler için piyasa ve relatif performans benchmark'
 
 ## Neleri ölçer?
 
-- Her gün yenilenen 24 saat/7 gün kısa vadeli teyit
+- Haftalık seçimde önceliklendirilen 7 günlük fiyat, BTC/ETH göreli güç ve ekosistem teyidi
 - USD, BTC ve ETH karşısında 30 gün, 200 gün ve 1 yıllık uzun vadeli güç
 - 24 saatlik hacim, piyasa değeri ve hacim/piyasa değeri oranı
 - DeFiLlama protokol/zincir TVL'si ile 1 gün, 7 gün ve 1 aylık değişim
@@ -18,6 +18,7 @@ BTC sıralamaya girmez; altcoinler için piyasa ve relatif performans benchmark'
 - Aşırı günlük/aylık yükseliş, TVL düşüşü ve olağandışı hacim için risk cezaları
 - Varsayılan olarak stablecoin ve CoinGecko `meme-token` kategorisini dışlama
 - Her aday için puan kırılımı, gerekçeler ve veri kapsamı
+- 100 USD bütçeyi kuruşu kuruşuna tamamlayan çeşitlendirilmiş sepet dağılımı
 - Genel ilk 5'ten ayrı bir `Catch-up/Mismatch` izleme listesi
 
 Haberler ile X/Reddit ölçümleri henüz puana dahil değildir. Rapor bu eksikliği açıkça gösterir; eksik veri yerine tahmin üretmez.
@@ -57,17 +58,17 @@ Gönderim:
 python3 -m daily_altcoin_recommendation
 ```
 
-## Günlük zamanlama
+## Haftalık zamanlama
 
-macOS/Linux `cron` örneği, her gün İstanbul saatiyle 09:00 için (makinenin saat dilimi Europe/Istanbul ise):
+macOS/Linux `cron` örneği, her pazartesi İstanbul saatiyle 09:05 için (makinenin saat dilimi Europe/Istanbul ise):
 
 ```cron
-0 9 * * * cd "/absolute/path/to/daily_altcoin_recommendation" && /usr/bin/python3 -m daily_altcoin_recommendation >> /tmp/daily_altcoin_recommendation.log 2>&1
+5 9 * * 1 cd "/absolute/path/to/daily_altcoin_recommendation" && /usr/bin/python3 -m daily_altcoin_recommendation >> /tmp/daily_altcoin_recommendation.log 2>&1
 ```
 
 Bilgisayar kapalı veya uykudaysa yerel zamanlayıcı çalışmayabilir. Sürekli çalışma için GitHub Actions, bir VPS veya sunucusuz zamanlayıcı kullanılmalıdır. E-posta ve API anahtarları repoya kaydedilmemelidir.
 
-Repoda hazır gelen `.github/workflows/daily_altcoin_recommendation.yml`, her gün 09:05 İstanbul saatinde çalışır. GitHub deposunun `Settings → Secrets and variables → Actions` bölümüne `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASSWORD`, `SMTP_FROM`, `SMTP_TO` ve isteğe bağlı `COINGECKO_API_KEY` secret'larını ekleyin. İlk gönderimi `Actions → daily_altcoin_recommendation → Run workflow` ile elle deneyin.
+Repoda hazır gelen `.github/workflows/daily_altcoin_recommendation.yml`, her pazartesi 09:05 İstanbul saatinde çalışır. GitHub deposunun `Settings → Secrets and variables → Actions` bölümüne `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASSWORD`, `SMTP_FROM`, `SMTP_TO` ve isteğe bağlı `COINGECKO_API_KEY` secret'larını ekleyin. İlk gönderimi `Actions → daily_altcoin_recommendation → Run workflow` ile elle deneyin.
 
 ## Tarihsel simülasyon
 
@@ -87,14 +88,14 @@ Simülasyon CoinGecko'nun tarihsel fiyat, market-cap ve hacmini; DefiLlama'nın 
 
 ## Puanlama notu
 
-Puanlar yatırım getirisi olasılığı değildir. Analiz her gün çalışır ve uzun vadeli aday listesi de her gün yeni verilerle değişebilir. Coin'ler aynı günkü uygun evren içinde yüzdelik sıralamayla karşılaştırılır. Mevcut bileşen ağırlıkları:
+Puanlar yatırım getirisi olasılığı değildir. Analiz haftada bir çalışır; coin'ler o haftaki uygun evren içinde yüzdelik sıralamayla karşılaştırılır. Sepetin yarısı eşit dağıtılır, kalan yarısı 40 puan üzerindeki risk-ayarlı güce orantılıdır. Mevcut bileşen ağırlıkları:
 
-- Kısa vadeli teyit (24 saat/7 gün): %10
-- Uzun vadeli güç (30 gün/200 gün/1 yıl): %20
+- Son 7 gün teyidi (24 saat ikincil): %30
+- Uzun vadeli güç (30 gün/200 gün/1 yıl): %15
 - Likidite: %15
-- DeFi/Ekosistem: %25
-- Tokenomics (MC/FDV): %15
-- Catch-up/Mismatch: %15
+- DeFi/Ekosistem (7 günlük değişimler öncelikli): %20
+- Tokenomics (MC/FDV): %10
+- Catch-up/Mismatch: %10
 
 Catch-up puanı; BTC/ETH'ye göre 7/30 günlük geride kalma, TVL/DEX büyümesinin 30 günlük fiyattan güçlü olması, TVL veya DEX hacminin market cap'e oranı ve son 24 saatte relatif toparlanma işaretlerini birlikte kullanır. DeFi/ekosistem verisi olmayan veya temeli zayıf coin yalnızca düştüğü için catch-up puanı alamaz.
 

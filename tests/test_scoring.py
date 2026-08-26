@@ -54,7 +54,7 @@ class ScoringTests(unittest.TestCase):
         falling = coin("falling", "Falling", "FAL", -18, -12, 100_000_000, usd30=-35)
         worse = coin("worse", "Worse", "WRS", -25, -20, 80_000_000, usd30=-45)
         result = rank_coins([falling, worse])
-        self.assertLess(result[0].component_scores["Kısa vadeli teyit"], 75)
+        self.assertLess(result[0].component_scores["Son 7 gün teyidi"], 75)
 
     def test_missing_long_history_gets_penalty(self):
         new_coin = coin("new", "New", "NEW", 15, 12, 100_000_000)

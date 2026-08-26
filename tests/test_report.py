@@ -11,10 +11,12 @@ class ReportTests(unittest.TestCase):
         for index in range(6):
             metrics = CoinMetrics(str(index), f"Coin <{index}>", "TST", 1e9, 1e8, 1)
             ranked.append(RankedCoin(metrics, 80 - index, {"Likidite": 70}, 0, ["Test"], [], ["Piyasa"]))
-        plain, html = render_report(ranked, datetime.now(timezone.utc), top_n=5)
+        plain, html = render_report(ranked, datetime.now(timezone.utc), top_n=5, basket_budget_usd=100)
         self.assertIn("Coin &lt;0&gt;", html)
         self.assertNotIn("Coin &lt;5&gt;", html)
         self.assertIn("Coin <0>", plain)
+        self.assertIn("$100.00 Haftalık Altcoin Sepeti", html)
+        self.assertIn("Önerilen Dağılım", html)
 
 
 if __name__ == "__main__":

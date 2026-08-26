@@ -76,6 +76,13 @@ def _average(values: List[Optional[float]]) -> Optional[float]:
     return sum(present) / len(present) if present else None
 
 
+def _weighted_average(values: List[tuple[Optional[float], float]]) -> Optional[float]:
+    present = [(value, weight) for value, weight in values if value is not None]
+    if not present:
+        return None
+    return sum(value * weight for value, weight in present) / sum(weight for _, weight in present)
+
+
 def _bounded_score(value: Optional[float], low: float, high: float) -> Optional[float]:
     if value is None:
         return None
@@ -85,12 +92,17 @@ def _bounded_score(value: Optional[float], low: float, high: float) -> Optional[
 def _score_coin(coin: CoinMetrics, p: Dict[str, Dict[str, float]]) -> RankedCoin:
     key = coin.coin_id
     components: Dict[str, float] = {}
-    short_relative = _average([p["usd24"].get(key), p["usd7"].get(key), p["btc7"].get(key), p["eth7"].get(key)])
-    short_absolute = _average([
-        _bounded_score(coin.usd_24h, -12, 12),
-        _bounded_score(coin.usd_7d, -20, 20),
-        _bounded_score(coin.btc_7d, -15, 15),
-        _bounded_score(coin.eth_7d, -15, 15),
+    # The basket is rebuilt weekly, so seven-day signals receive three times
+    # the influence of the noisier 24-hour move.
+    short_relative = _weighted_average([
+        (p["usd24"].get(key), 1), (p["usd7"].get(key), 3),
+        (p["btc7"].get(key), 3), (p["eth7"].get(key), 3),
+    ])
+    short_absolute = _weighted_average([
+        (_bounded_score(coin.usd_24h, -12, 12), 1),
+        (_bounded_score(coin.usd_7d, -20, 20), 3),
+        (_bounded_score(coin.btc_7d, -15, 15), 3),
+        (_bounded_score(coin.eth_7d, -15, 15), 3),
     ])
     short_term = _blend(short_relative, short_absolute, 0.55)
     long_relative = _average([
@@ -111,10 +123,10 @@ def _score_coin(coin: CoinMetrics, p: Dict[str, Dict[str, float]]) -> RankedCoin
     ])
     long_term = _blend(long_relative, long_absolute, 0.55)
     liquidity = _average([p["volume"].get(key), p["turnover"].get(key)])
-    defi = _average([
-        p["tvl"].get(key), p["tvl7"].get(key), p["tvl1m"].get(key),
-        p["dex"].get(key), p["dex30"].get(key), p["dex1"].get(key),
-        p["dex7"].get(key), p["dex1m"].get(key),
+    defi = _weighted_average([
+        (p["tvl"].get(key), 1), (p["tvl7"].get(key), 3), (p["tvl1m"].get(key), 1),
+        (p["dex"].get(key), 1), (p["dex30"].get(key), 1), (p["dex1"].get(key), 1),
+        (p["dex7"].get(key), 3), (p["dex1m"].get(key), 1),
     ])
     tokenomics = _tokenomics_score(coin)
     catch_up = None
@@ -134,7 +146,7 @@ def _score_coin(coin: CoinMetrics, p: Dict[str, Dict[str, float]]) -> RankedCoin
             if ecosystem_growth is None or ecosystem_growth <= 0:
                 catch_up = min(catch_up, 25.0)
     if short_term is not None:
-        components["Kısa vadeli teyit"] = short_term
+        components["Son 7 gün teyidi"] = short_term
     if long_term is not None:
         components["Uzun vadeli güç"] = long_term
     if liquidity is not None:
@@ -147,12 +159,12 @@ def _score_coin(coin: CoinMetrics, p: Dict[str, Dict[str, float]]) -> RankedCoin
         components["Catch-up/Mismatch"] = catch_up
 
     base_weights = {
-        "Kısa vadeli teyit": 0.10,
-        "Uzun vadeli güç": 0.20,
+        "Son 7 gün teyidi": 0.30,
+        "Uzun vadeli güç": 0.15,
         "Likidite": 0.15,
-        "DeFi/Ekosistem": 0.25,
-        "Tokenomics": 0.15,
-        "Catch-up/Mismatch": 0.15,
+        "DeFi/Ekosistem": 0.20,
+        "Tokenomics": 0.10,
+        "Catch-up/Mismatch": 0.10,
     }
     # Missing coverage must not make the remaining strong components more
     # influential. Unknown components stay neutral until a provider supplies data.

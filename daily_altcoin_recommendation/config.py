@@ -29,6 +29,7 @@ class Settings:
     coingecko_api_key: str = ""
     coingecko_plan: str = "demo"
     top_n: int = 5
+    basket_budget_usd: float = 100.0
     universe_size: int = 120
     min_market_cap_usd: float = 50_000_000
     min_volume_usd: float = 5_000_000
@@ -49,6 +50,7 @@ class Settings:
             coingecko_api_key=os.getenv("COINGECKO_API_KEY", ""),
             coingecko_plan=os.getenv("COINGECKO_PLAN", "demo"),
             top_n=int(os.getenv("TOP_N", "5")),
+            basket_budget_usd=float(os.getenv("BASKET_BUDGET_USD", "100")),
             universe_size=int(os.getenv("UNIVERSE_SIZE", "120")),
             min_market_cap_usd=float(os.getenv("MIN_MARKET_CAP_USD", "50000000")),
             min_volume_usd=float(os.getenv("MIN_VOLUME_USD", "5000000")),
