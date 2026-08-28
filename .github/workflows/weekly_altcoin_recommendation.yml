@@ -1,11 +1,11 @@
-name: daily_altcoin_recommendation
+name: weekly_altcoin_recommendation
 
 on:
   workflow_dispatch:
   schedule:
     # Avoid the top-of-hour congestion window on GitHub-hosted runners.
-    - cron: "5 9 * * 1"
-      timezone: "Europe/Istanbul"
+    # GitHub Actions schedules use UTC. 06:05 UTC is 09:05 in Istanbul.
+    - cron: "5 6 * * 1"
 
 jobs:
   report:
@@ -32,4 +32,4 @@ jobs:
       - name: Run tests
         run: python -m unittest discover -s tests -v
       - name: Send report
-        run: python -m daily_altcoin_recommendation
+        run: python -m weekly_altcoin_recommendation

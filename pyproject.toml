@@ -3,13 +3,13 @@ requires = ["setuptools>=61"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "daily_altcoin_recommendation"
+name = "weekly_altcoin_recommendation"
 version = "0.1.0"
-description = "Daily, explainable crypto candidate ranking and email report"
+description = "Weekly, explainable altcoin basket ranking and email report"
 requires-python = ">=3.9"
 
 [project.scripts]
-daily_altcoin_recommendation = "daily_altcoin_recommendation.__main__:main"
+weekly_altcoin_recommendation = "weekly_altcoin_recommendation.__main__:main"
 
 [tool.setuptools]
-packages = ["daily_altcoin_recommendation"]
+packages = ["weekly_altcoin_recommendation"]

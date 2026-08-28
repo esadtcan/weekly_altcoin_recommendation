@@ -19,7 +19,7 @@ def get_json(
 ) -> Any:
     if params:
         url = f"{url}?{urlencode(params)}"
-    request_headers = {"Accept": "application/json", "User-Agent": "daily_altcoin_recommendation/0.1"}
+    request_headers = {"Accept": "application/json", "User-Agent": "weekly_altcoin_recommendation/0.1"}
     request_headers.update(headers or {})
     last_error: Optional[Exception] = None
     for attempt in range(retries + 1):

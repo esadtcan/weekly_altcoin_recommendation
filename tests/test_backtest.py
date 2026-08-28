@@ -1,7 +1,7 @@
 from datetime import date, datetime, timezone
 import unittest
 
-from daily_altcoin_recommendation.backtest import _daily_map, _on_or_before, _return
+from weekly_altcoin_recommendation.backtest import _daily_map, _on_or_before, _return
 
 
 class BacktestTests(unittest.TestCase):

@@ -1,46 +1,74 @@
-# daily_altcoin_recommendation
+# weekly_altcoin_recommendation
 
-Her pazartesi piyasa ve DeFi verilerini toplayıp en güçlü 5 altcoinden 100 USD'lik açıklanabilir bir sepet oluşturan HTML e-posta karar destek sistemi.
+An explainable decision-support system that builds a diversified **$100 weekly basket of five altcoins** and delivers the result as an HTML email every Monday.
 
-BTC sıralamaya girmez; altcoinler için piyasa ve relatif performans benchmark'ı olarak kullanılır.
+Bitcoin is not eligible for the basket. It is used as a market and relative-performance benchmark alongside Ethereum.
 
-> Bu yazılım yatırım tavsiyesi vermez ve getiri garantisi sunmaz. İlk sürüm gerçek emir göndermez.
+> This software is for research and decision support only. It does not provide financial advice, guarantee returns, or place real orders.
 
-## Neleri ölçer?
+## What it analyzes
 
-- Haftalık seçimde önceliklendirilen 7 günlük fiyat, BTC/ETH göreli güç ve ekosistem teyidi
-- USD, BTC ve ETH karşısında 30 gün, 200 gün ve 1 yıllık uzun vadeli güç
-- 24 saatlik hacim, piyasa değeri ve hacim/piyasa değeri oranı
-- DeFiLlama protokol/zincir TVL'si ile 1 gün, 7 gün ve 1 aylık değişim
-- Eşleşebilen DEX'lerde 24 saat, 7 gün ve 30 günlük hacim
-- Fundamental büyüme ile fiyat performansı arasındaki `Catch-up/Mismatch`
-- Market cap / FDV üzerinden gelecekteki arz baskısı
-- Aşırı günlük/aylık yükseliş, TVL düşüşü ve olağandışı hacim için risk cezaları
-- Varsayılan olarak stablecoin ve CoinGecko `meme-token` kategorisini dışlama
-- Her aday için puan kırılımı, gerekçeler ve veri kapsamı
-- 100 USD bütçeyi kuruşu kuruşuna tamamlayan çeşitlendirilmiş sepet dağılımı
-- Genel ilk 5'ten ayrı bir `Catch-up/Mismatch` izleme listesi
+- Seven-day price action, BTC/ETH-relative strength, and ecosystem confirmation as the primary weekly signals
+- Longer-term strength over 30 days, 200 days, and one year in USD, BTC, and ETH terms
+- 24-hour volume, market capitalization, and volume-to-market-cap ratios
+- DeFiLlama protocol and chain TVL, including one-day, seven-day, and one-month changes
+- DEX volume over 24 hours, seven days, and 30 days where a reliable match is available
+- Fundamental-growth versus price-performance divergence through the `Catch-up/Mismatch` component
+- Future supply pressure using market-cap-to-FDV ratios
+- Risk penalties for excessive short-term rallies, TVL deterioration, unusual volume, and weak data coverage
+- Stablecoin and CoinGecko `meme-token` category exclusions by default
+- A transparent score breakdown, selection reasons, risks, and data coverage for every candidate
+- An exact-dollar allocation that always reconciles to the configured weekly budget
+- A separate `Catch-up/Mismatch` watchlist in addition to the overall top five
 
-Haberler ile X/Reddit ölçümleri henüz puana dahil değildir. Rapor bu eksikliği açıkça gösterir; eksik veri yerine tahmin üretmez.
+News and X/Reddit metrics are not yet included in the score. The report states this limitation instead of inventing missing data.
 
-## Yerel kurulum
+## Requirements
 
-Python 3.9 veya üzeri yeterlidir; harici Python paketi gerekmez.
+- Python 3.9 or newer
+- No third-party Python packages
+- Network access to CoinGecko and DeFiLlama
+- SMTP credentials for email delivery
+
+## Local setup
 
 ```bash
+git clone https://github.com/esadtcan/weekly_altcoin_recommendation.git
+cd weekly_altcoin_recommendation
 python3 -m unittest discover -s tests -v
-python3 -m daily_altcoin_recommendation --dry-run
 ```
 
-Oluşan rapor `reports/latest.html` dosyasına yazılır.
+Generate a report without sending email:
 
-## E-posta ayarı
+```bash
+python3 -m weekly_altcoin_recommendation --dry-run
+```
 
-`.env.example` dosyasını `.env` adıyla kopyalayıp değerleri doldurun. Uygulama çalışma dizinindeki `.env` dosyasını otomatik okur; gerçek ortam değişkenleri varsa onlar önceliklidir. `.env` Git tarafından dışlanır ve repoya kaydedilmez.
+The report is written to `reports/latest.html` by default. Use `--output` to choose another path:
 
-Gmail kullanılıyorsa normal hesap parolası yerine iki aşamalı doğrulama ile oluşturulan bir uygulama parolası gerekir.
+```bash
+python3 -m weekly_altcoin_recommendation --dry-run --output reports/example.html
+```
 
-Gerekli değerler:
+## Configuration
+
+Copy `.env.example` to `.env` and edit the values. The application loads `.env` from the current working directory without overriding environment variables that are already set. `.env` is excluded from Git.
+
+Analysis settings:
+
+```text
+COINGECKO_API_KEY=
+COINGECKO_PLAN=demo
+TOP_N=5
+BASKET_BUDGET_USD=100
+UNIVERSE_SIZE=120
+MIN_MARKET_CAP_USD=50000000
+MIN_VOLUME_USD=5000000
+EXCLUDE_MEME_COINS=true
+REPORT_TIMEZONE=Europe/Istanbul
+```
+
+Email settings:
 
 ```text
 SMTP_HOST=smtp.gmail.com
@@ -52,51 +80,75 @@ SMTP_TO=destination@example.com
 SMTP_STARTTLS=true
 ```
 
-Gönderim:
+Gmail accounts should use an app password created after enabling two-factor authentication, not the normal account password.
+
+Send the report immediately:
 
 ```bash
-python3 -m daily_altcoin_recommendation
+python3 -m weekly_altcoin_recommendation
 ```
 
-## Haftalık zamanlama
+## Weekly GitHub Actions schedule
 
-macOS/Linux `cron` örneği, her pazartesi İstanbul saatiyle 09:05 için (makinenin saat dilimi Europe/Istanbul ise):
+The included `.github/workflows/weekly_altcoin_recommendation.yml` workflow runs every Monday at **09:05 Europe/Istanbul**. GitHub Actions cron expressions use UTC, so the workflow uses `06:05 UTC`; Istanbul remains UTC+3 year-round.
+
+Add these repository secrets under **Settings → Secrets and variables → Actions**:
+
+- `SMTP_HOST`
+- `SMTP_PORT`
+- `SMTP_USER`
+- `SMTP_PASSWORD`
+- `SMTP_FROM`
+- `SMTP_TO`
+- `COINGECKO_API_KEY` (optional)
+
+Test the first delivery manually from **Actions → weekly_altcoin_recommendation → Run workflow**.
+
+## Local scheduling
+
+On a machine configured for the `Europe/Istanbul` time zone, this cron entry runs every Monday at 09:05:
 
 ```cron
-5 9 * * 1 cd "/absolute/path/to/daily_altcoin_recommendation" && /usr/bin/python3 -m daily_altcoin_recommendation >> /tmp/daily_altcoin_recommendation.log 2>&1
+5 9 * * 1 cd "/absolute/path/to/weekly_altcoin_recommendation" && /usr/bin/python3 -m weekly_altcoin_recommendation >> /tmp/weekly_altcoin_recommendation.log 2>&1
 ```
 
-Bilgisayar kapalı veya uykudaysa yerel zamanlayıcı çalışmayabilir. Sürekli çalışma için GitHub Actions, bir VPS veya sunucusuz zamanlayıcı kullanılmalıdır. E-posta ve API anahtarları repoya kaydedilmemelidir.
+A local schedule will not run while the computer is powered off or asleep. GitHub Actions, a VPS, or another hosted scheduler is preferable for unattended delivery.
 
-Repoda hazır gelen `.github/workflows/daily_altcoin_recommendation.yml`, her pazartesi 09:05 İstanbul saatinde çalışır. GitHub deposunun `Settings → Secrets and variables → Actions` bölümüne `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASSWORD`, `SMTP_FROM`, `SMTP_TO` ve isteğe bağlı `COINGECKO_API_KEY` secret'larını ekleyin. İlk gönderimi `Actions → daily_altcoin_recommendation → Run workflow` ile elle deneyin.
+## Historical simulation
 
-## Tarihsel simülasyon
-
-30 coinlik araştırma evrenini geçmiş bir günün kapanışında sıralayıp sonraki yedi günlük getiriyi ölçmek için:
+Rank the research universe at a historical close and calculate the following seven-day return:
 
 ```bash
-python3 -m daily_altcoin_recommendation.backtest --as-of 2026-08-13 --top 5
+python3 -m weekly_altcoin_recommendation.backtest --as-of 2026-08-13 --top 5
 ```
 
-Bir tarih aralığındaki her günün ayrı önerilerini görmek için:
+Generate a separate recommendation for every day in a historical interval:
 
 ```bash
-python3 -m daily_altcoin_recommendation.backtest --as-of 2026-08-14 --daily-through 2026-08-20 --top 5
+python3 -m weekly_altcoin_recommendation.backtest --as-of 2026-08-14 --daily-through 2026-08-20 --top 5
 ```
 
-Simülasyon CoinGecko'nun tarihsel fiyat, market-cap ve hacmini; DefiLlama'nın tarihsel TVL'sini kullanır. Geçmiş DEX hacmi, haberler, sosyal veriler ve ücretsiz planda bulunmayan kesin tarihsel arz/unlock bilgileri dahil değildir. Geçmiş MC/FDV yaklaşık olarak güncel orandan türetilir; sonuç bu nedenle araştırma simülasyonudur, eksiksiz bir kurumsal backtest değildir.
+The simulation uses historical CoinGecko price, market-cap, and volume data together with historical DeFiLlama TVL. It does not include historical DEX volume, news, social data, or precise historical unlock data unavailable on the free plan. Historical market-cap-to-FDV is approximated from the current ratio, so this is a research simulation rather than an institutional-grade backtest.
 
-## Puanlama notu
+## Scoring model
 
-Puanlar yatırım getirisi olasılığı değildir. Analiz haftada bir çalışır; coin'ler o haftaki uygun evren içinde yüzdelik sıralamayla karşılaştırılır. Sepetin yarısı eşit dağıtılır, kalan yarısı 40 puan üzerindeki risk-ayarlı güce orantılıdır. Mevcut bileşen ağırlıkları:
+Scores are relative rankings within the eligible weekly universe, not probabilities of future returns.
 
-- Son 7 gün teyidi (24 saat ikincil): %30
-- Uzun vadeli güç (30 gün/200 gün/1 yıl): %15
-- Likidite: %15
-- DeFi/Ekosistem (7 günlük değişimler öncelikli): %20
-- Tokenomics (MC/FDV): %10
-- Catch-up/Mismatch: %10
+| Component | Weight |
+| --- | ---: |
+| Seven-day confirmation, with 24-hour data as a secondary signal | 30% |
+| Long-term strength over 30 days, 200 days, and one year | 15% |
+| Liquidity | 15% |
+| DeFi and ecosystem strength, prioritizing seven-day changes | 20% |
+| Tokenomics using market cap / FDV | 10% |
+| Catch-up / mismatch | 10% |
 
-Catch-up puanı; BTC/ETH'ye göre 7/30 günlük geride kalma, TVL/DEX büyümesinin 30 günlük fiyattan güçlü olması, TVL veya DEX hacminin market cap'e oranı ve son 24 saatte relatif toparlanma işaretlerini birlikte kullanır. DeFi/ekosistem verisi olmayan veya temeli zayıf coin yalnızca düştüğü için catch-up puanı alamaz.
+Half of the weekly basket is equally allocated. The other half is distributed in proportion to risk-adjusted conviction above a score of 40.
 
-Bir bileşenin verisi yoksa eksik alan 50/100 nötr kabul edilir; ağırlığı diğer güçlü bileşenlere dağıtılarak puanın yapay biçimde şişmesine izin verilmez. Eksiklik raporda ayrıca gösterilir.
+The catch-up score combines seven-day and 30-day BTC/ETH-relative underperformance, TVL or DEX growth that exceeds 30-day price performance, TVL or DEX volume relative to market capitalization, and signs of 24-hour relative recovery. A coin cannot receive a strong catch-up score merely because its price has fallen; supporting ecosystem data is required.
+
+When a component is unavailable, it receives a neutral 50/100 value and its weight is redistributed without allowing missing data to inflate the total score. Missing coverage is also disclosed in the report.
+
+## Risk notice
+
+Cryptocurrency markets are highly volatile. Review the generated evidence, liquidity, tokenomics, and risk flags independently before making any investment decision.

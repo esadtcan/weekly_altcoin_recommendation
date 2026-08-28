@@ -1,8 +1,8 @@
 from datetime import datetime, timezone
 import unittest
 
-from daily_altcoin_recommendation.models import CoinMetrics, RankedCoin
-from daily_altcoin_recommendation.report import render_report
+from weekly_altcoin_recommendation.models import CoinMetrics, RankedCoin
+from weekly_altcoin_recommendation.report import render_report
 
 
 class ReportTests(unittest.TestCase):

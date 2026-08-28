@@ -1,7 +1,7 @@
 import unittest
 
-from daily_altcoin_recommendation.models import CoinMetrics, RankedCoin
-from daily_altcoin_recommendation.portfolio import allocate_basket
+from weekly_altcoin_recommendation.models import CoinMetrics, RankedCoin
+from weekly_altcoin_recommendation.portfolio import allocate_basket
 
 
 def ranked(index: int, score: float) -> RankedCoin:
